@@ -561,7 +561,7 @@
           <span class="land-cat-label">Juices</span>
         </div>
 
-        <!-- 📜 VIEW FULL MENU (spans all 3 columns) -->
+        <!-- 📜 VIEW FULL MENU -->
         <div class="land-cat full-row" onclick="openMenu('coffee')">
           <span class="land-cat-icon">📜</span>
           <span class="land-cat-label">View Full Menu</span>
@@ -598,220 +598,417 @@
     </nav>
 
     <!-- ══════════════════════════════════════════
-         ☕  COFFEE SECTION
-         HOW TO ADD ITEMS:
-           1. Find this section below (id="coffee")
-           2. Copy a <div class="menu-item"> block
-           3. Paste it inside <div class="items-list">
-           4. Edit: item-name, item-desc, item-price
-           Optional badge: <span class="item-badge">New</span>
-           To add a group header: <div class="group-label">Label</div>
+         ☕  SECTION CAFÉ
+         COMMENT AJOUTER UN ARTICLE :
+           1. Copier un bloc <div class="menu-item">
+           2. Coller à l'intérieur de <div class="items-list">
+           3. Modifier : item-name, item-desc, item-price
+           Badge optionnel : <span class="item-badge">Nouveau</span>
+           Séparateur de groupe : <div class="group-label">Nom</div>
     ══════════════════════════════════════════ -->
     <section class="section active" id="coffee">
       <div class="section-header">
         <h2 class="section-title">Coffee</h2>
-        <p class="section-desc">Crafted with single-origin beans — served with passion.</p>
+        <p class="section-desc">Chaque tasse, une œuvre en soi.</p>
       </div>
       <div class="items-list">
 
-        <div class="group-label">Hot</div>
+        <div class="group-label">Chaud</div>
 
-        <!-- ↓ ITEM — copy & paste this block to add more -->
+        <!-- ↓ ARTICLE — copier ce bloc pour en ajouter d'autres -->
         <div class="menu-item">
           <div class="item-info">
             <p class="item-name">Espresso</p>
-            <p class="item-desc">Pure, concentrated shot. Bold and aromatic.</p>
+            <p class="item-desc">L'art dans sa forme la plus pure.</p>
           </div>
-          <div class="item-price"><span class="currency">DT</span>3.500</div>
+          <div class="item-price"><span class="currency">DT</span>3,500</div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <p class="item-name">Lavazza</p>
+            <p class="item-desc">Grain italien, âme de cinéma.</p>
+          </div>
+          <div class="item-price"><span class="currency">DT</span>4,500</div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <p class="item-name">Américano</p>
+            <p class="item-desc">Noir comme une toile vierge.</p>
+          </div>
+          <div class="item-price"><span class="currency">DT</span>5,000</div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <p class="item-name">Direct</p>
+            <p class="item-desc">Saveur directe, geste d'artiste.</p>
+          </div>
+          <div class="item-price"><span class="currency">DT</span>5,000</div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <p class="item-name">Capucin</p>
+            <p class="item-desc">Douceur en nuances de brun.</p>
+          </div>
+          <div class="item-price"><span class="currency">DT</span>4,000</div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <p class="item-name">Café Crème</p>
+            <p class="item-desc">Velouté comme un voile d'aquarelle.</p>
+          </div>
+          <div class="item-price"><span class="currency">DT</span>5,700</div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <p class="item-name">Café Turc</p>
+            <p class="item-desc">Tradition ancienne, poésie liquide.</p>
+          </div>
+          <div class="item-price"><span class="currency">DT</span>5,000</div>
         </div>
 
         <div class="menu-item">
           <div class="item-info">
             <p class="item-name">Cappuccino</p>
-            <p class="item-desc">Espresso, steamed milk & velvety foam.</p>
+            <p class="item-desc">Mousse légère comme une esquisse.</p>
           </div>
-          <div class="item-price"><span class="currency">DT</span>5.000</div>
+          <div class="item-price"><span class="currency">DT</span>6,000</div>
+        </div>
+
+        <!-- ↓ AJOUTER D'AUTRES CAFÉS CHAUDS ICI -->
+
+        <div class="group-label">Froid</div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <p class="item-name">Frappuccino</p>
+            <p class="item-desc">Fraîcheur glacée, couleurs mêlées.</p>
+          </div>
+          <div class="item-price"><span class="currency">DT</span>7,000</div>
         </div>
 
         <div class="menu-item">
           <div class="item-info">
-            <p class="item-name">Latte</p>
-            <p class="item-desc">Smooth espresso with creamy steamed milk.</p>
+            <p class="item-name">Ice Coffee</p>
+            <p class="item-desc">Intensité sur fond de glace.</p>
           </div>
-          <div class="item-price"><span class="currency">DT</span>5.500</div>
+          <div class="item-price"><span class="currency">DT</span>6,500</div>
         </div>
-
-        <!-- ↓ ADD MORE HOT COFFEE ITEMS HERE -->
-
-        <div class="group-label">Cold</div>
 
         <div class="menu-item">
           <div class="item-info">
-            <p class="item-name">Cold Brew</p>
-            <p class="item-desc">Slow-steeped 18 hours. Silky, never bitter.</p>
+            <p class="item-name">Ice Latte</p>
+            <p class="item-desc">Lait et café, duo pictural froid.</p>
+          </div>
+          <div class="item-price"><span class="currency">DT</span>6,000</div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <p class="item-name">Machiato</p>
+            <p class="item-desc">Une touche, comme une signature.</p>
             <span class="item-badge">Signature</span>
           </div>
-          <div class="item-price"><span class="currency">DT</span>7.000</div>
+          <div class="item-price"><span class="currency">DT</span>6,500</div>
         </div>
 
-        <div class="menu-item">
-          <div class="item-info">
-            <p class="item-name">Iced Latte</p>
-            <p class="item-desc">Double shot over ice, topped with cold milk.</p>
-          </div>
-          <div class="item-price"><span class="currency">DT</span>6.500</div>
-        </div>
-
-        <!-- ↓ ADD MORE COLD COFFEE ITEMS HERE -->
+        <!-- ↓ AJOUTER D'AUTRES CAFÉS FROIDS ICI -->
 
       </div>
     </section>
 
     <!-- ══════════════════════════════════════════
-         🍵  TEA SECTION
-         HOW TO ADD: copy a menu-item block, paste inside items-list, edit content.
+         🍵  SECTION THÉ
+         COMMENT AJOUTER : copier un bloc menu-item, coller dans items-list, modifier.
     ══════════════════════════════════════════ -->
     <section class="section" id="tea">
       <div class="section-header">
         <h2 class="section-title">Tea</h2>
-        <p class="section-desc">Rare blends from around the world. Steeped to perfection.</p>
+        <p class="section-desc">Infusions inspirées par la créativité.</p>
       </div>
       <div class="items-list">
 
-        <div class="group-label">Classic</div>
-
-        <!-- ↓ ITEM — copy & paste this block to add more -->
+        <!-- ↓ ARTICLE — copier ce bloc pour en ajouter d'autres -->
         <div class="menu-item">
           <div class="item-info">
-            <p class="item-name">Earl Grey</p>
-            <p class="item-desc">Bergamot-infused black tea. Timeless.</p>
+            <p class="item-name">Thé Nature</p>
+            <p class="item-desc">Pureté calme, toile blanche.</p>
           </div>
-          <div class="item-price"><span class="currency">DT</span>4.000</div>
+          <div class="item-price"><span class="currency">DT</span>3,000</div>
         </div>
 
         <div class="menu-item">
           <div class="item-info">
-            <p class="item-name">Moroccan Mint</p>
-            <p class="item-desc">Fresh spearmint & green tea. Sweet and uplifting.</p>
-            <span class="item-badge">Popular</span>
+            <p class="item-name">Thé aux Cacahuètes</p>
+            <p class="item-desc">Chaleur gourmande, texture d'atelier.</p>
           </div>
-          <div class="item-price"><span class="currency">DT</span>4.500</div>
+          <div class="item-price"><span class="currency">DT</span>7,000</div>
         </div>
 
-        <!-- ↓ ADD MORE TEA ITEMS HERE -->
+        <div class="menu-item">
+          <div class="item-info">
+            <p class="item-name">Thé aux Amandes</p>
+            <p class="item-desc">Élégance douce, trait délicat.</p>
+          </div>
+          <div class="item-price"><span class="currency">DT</span>5,000</div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <p class="item-name">Thé Dar El Fan</p>
+            <p class="item-desc">Notre création, l'art en tasse.</p>
+            <span class="item-badge">Spécialité maison</span>
+          </div>
+          <div class="item-price"><span class="currency">DT</span>9,000</div>
+        </div>
+
+        <!-- ↓ AJOUTER D'AUTRES THÉS ICI -->
 
       </div>
     </section>
 
     <!-- ══════════════════════════════════════════
          🥤  DRINKS SECTION
-         HOW TO ADD: copy a menu-item block, paste inside items-list, edit content.
+         COMMENT AJOUTER : copier un bloc menu-item, coller dans items-list, modifier.
     ══════════════════════════════════════════ -->
     <section class="section" id="drinks">
       <div class="section-header">
         <h2 class="section-title">Drinks</h2>
-        <p class="section-desc">Non-coffee, full flavour. Something for everyone.</p>
+        <p class="section-desc">Pour tous les goûts, sans exception.</p>
       </div>
       <div class="items-list">
 
-        <!-- ↓ ITEM — copy & paste this block to add more -->
+        <div class="group-label">Sodas & Mojitos</div>
+
+        <!-- ↓ ARTICLE — copier ce bloc pour en ajouter d'autres -->
         <div class="menu-item">
           <div class="item-info">
-            <p class="item-name">Hot Chocolate</p>
-            <p class="item-desc">Rich Belgian cocoa with steamed milk.</p>
+            <p class="item-name">Soda</p>
+            <p class="item-desc">Bulles vives, trait pétillant.</p>
           </div>
-          <div class="item-price"><span class="currency">DT</span>6.000</div>
+          <div class="item-price"><span class="currency">DT</span>4,000</div>
         </div>
 
         <div class="menu-item">
           <div class="item-info">
-            <p class="item-name">Sparkling Water</p>
-            <p class="item-desc">Chilled and crisp.</p>
+            <p class="item-name">Mojito Virgin</p>
+            <p class="item-desc">Fraîcheur pure, harmonie végétale.</p>
           </div>
-          <div class="item-price"><span class="currency">DT</span>2.500</div>
+          <div class="item-price"><span class="currency">DT</span>6,000</div>
         </div>
 
-        <!-- ↓ ADD MORE DRINK ITEMS HERE -->
+        <div class="menu-item">
+          <div class="item-info">
+            <p class="item-name">Mojito Blue</p>
+            <p class="item-desc">Azur glacé, palette exquise.</p>
+          </div>
+          <div class="item-price"><span class="currency">DT</span>7,000</div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <p class="item-name">Mojito Red</p>
+            <p class="item-desc">Rouge passion, couleur d'artiste.</p>
+          </div>
+          <div class="item-price"><span class="currency">DT</span>7,000</div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <p class="item-name">Mojito Exotique</p>
+            <p class="item-desc">Saveurs lointaines, toile tropicale.</p>
+          </div>
+          <div class="item-price"><span class="currency">DT</span>7,500</div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <p class="item-name">Mojito Piña Colada</p>
+            <p class="item-desc">Coco & ananas, duo pictural.</p>
+          </div>
+          <div class="item-price"><span class="currency">DT</span>7,500</div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <p class="item-name">Smoothie</p>
+            <p class="item-desc">Fruits mixés, nuances douces.</p>
+          </div>
+          <div class="item-price"><span class="currency">DT</span>7,500</div>
+        </div>
+
+        <div class="group-label">Chocolats Chauds</div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <p class="item-name">Chocolat Chaud</p>
+            <p class="item-desc">Velours sombre, chaleur intime.</p>
+          </div>
+          <div class="item-price"><span class="currency">DT</span>5,500</div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <p class="item-name">Chocolat Chaud Aromatisé</p>
+            <p class="item-desc">Épices subtiles, œuvre parfumée.</p>
+          </div>
+          <div class="item-price"><span class="currency">DT</span>6,500</div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <p class="item-name">Chocolat Chaud aux Fruits Secs</p>
+            <p class="item-desc">Croquant & doux, contraste pictural.</p>
+          </div>
+          <div class="item-price"><span class="currency">DT</span>7,500</div>
+        </div>
+
+        <div class="group-label">Milk Shakes</div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <p class="item-name">Milk Shake Oreo</p>
+            <p class="item-desc">Noir & blanc, contraste d'art.</p>
+          </div>
+          <div class="item-price"><span class="currency">DT</span>7,500</div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <p class="item-name">Milk Shake Lotus</p>
+            <p class="item-desc">Caramel croustillant, nuance rare.</p>
+          </div>
+          <div class="item-price"><span class="currency">DT</span>7,500</div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <p class="item-name">Milk Shake Chocolat</p>
+            <p class="item-desc">Classique onctueux, ton profond.</p>
+          </div>
+          <div class="item-price"><span class="currency">DT</span>6,000</div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <p class="item-name">Jwejem Dar El Fan</p>
+            <p class="item-desc">Notre chef-d'œuvre liquide absolu.</p>
+            <span class="item-badge">Spécialité maison</span>
+          </div>
+          <div class="item-price"><span class="currency">DT</span>18,000</div>
+        </div>
+
+        <!-- ↓ AJOUTER D'AUTRES BOISSONS ICI -->
 
       </div>
     </section>
 
     <!-- ══════════════════════════════════════════
-         🍰  SWEETS SECTION
-         HOW TO ADD: copy a menu-item block, paste inside items-list, edit content.
+         🍰  SECTION DOUCEURS
+         COMMENT AJOUTER : copier un bloc menu-item, coller dans items-list, modifier.
     ══════════════════════════════════════════ -->
     <section class="section" id="sweets">
       <div class="section-header">
         <h2 class="section-title">Sweets</h2>
-        <p class="section-desc">Handmade daily. Indulge without compromise.</p>
+        <p class="section-desc">Faits maison, chaque jour, avec soin.</p>
       </div>
       <div class="items-list">
 
-        <!-- ↓ ITEM — copy & paste this block to add more -->
+        <!-- ↓ ARTICLE — copier ce bloc pour en ajouter d'autres -->
         <div class="menu-item">
           <div class="item-info">
             <p class="item-name">Tiramisu</p>
-            <p class="item-desc">Classic Italian. Mascarpone, espresso, cocoa dust.</p>
-            <span class="item-badge">Chef's Pick</span>
+            <p class="item-desc">Couches douces, œuvre italienne.</p>
+            <span class="item-badge">Choix du chef</span>
           </div>
-          <div class="item-price"><span class="currency">DT</span>9.000</div>
+          <div class="item-price"><span class="currency">DT</span>9,000</div>
         </div>
 
         <div class="menu-item">
           <div class="item-info">
-            <p class="item-name">Chocolate Lava Cake</p>
-            <p class="item-desc">Warm, molten centre. Served with vanilla cream.</p>
+            <p class="item-name">Moelleux au Chocolat</p>
+            <p class="item-desc">Cœur fondu, sculpture gourmande.</p>
           </div>
-          <div class="item-price"><span class="currency">DT</span>10.000</div>
+          <div class="item-price"><span class="currency">DT</span>10,000</div>
         </div>
 
-        <!-- ↓ ADD MORE SWEET ITEMS HERE -->
+        <!-- ↓ AJOUTER D'AUTRES DOUCEURS ICI -->
 
       </div>
     </section>
 
     <!-- ══════════════════════════════════════════
-         🍊  JUICES SECTION
-         HOW TO ADD: copy a menu-item block, paste inside items-list, edit content.
+         🍊  SECTION JUS
+         COMMENT AJOUTER : copier un bloc menu-item, coller dans items-list, modifier.
     ══════════════════════════════════════════ -->
     <section class="section" id="juices">
       <div class="section-header">
         <h2 class="section-title">Juices</h2>
-        <p class="section-desc">Freshly pressed. Seasonal. Pure.</p>
+        <p class="section-desc">Pressés à la minute, couleurs vives.</p>
       </div>
       <div class="items-list">
 
-        <div class="group-label">Fresh Pressed</div>
+        <div class="group-label">Pressés</div>
 
-        <!-- ↓ ITEM — copy & paste this block to add more -->
+        <!-- ↓ ARTICLE — copier ce bloc pour en ajouter d'autres -->
+        <div class="menu-item">
+          <div class="item-info">
+            <p class="item-name">Fraise</p>
+            <p class="item-desc">Rouge passion, pigment naturel.</p>
+          </div>
+          <div class="item-price"><span class="currency">DT</span>7,000</div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <p class="item-name">Banane</p>
+            <p class="item-desc">Onctueux et doux, ton chaud.</p>
+          </div>
+          <div class="item-price"><span class="currency">DT</span>8,000</div>
+        </div>
+
         <div class="menu-item">
           <div class="item-info">
             <p class="item-name">Orange</p>
-            <p class="item-desc">Sun-kissed citrus, freshly squeezed to order.</p>
+            <p class="item-desc">Soleil pressé, éclat vivant.</p>
           </div>
-          <div class="item-price"><span class="currency">DT</span>5.000</div>
+          <div class="item-price"><span class="currency">DT</span>4,500</div>
         </div>
 
         <div class="menu-item">
           <div class="item-info">
-            <p class="item-name">Carrot & Ginger</p>
-            <p class="item-desc">Earthy, spiced, energising. A morning classic.</p>
+            <p class="item-name">Citron</p>
+            <p class="item-desc">Acidité franche, trait vif.</p>
           </div>
-          <div class="item-price"><span class="currency">DT</span>5.500</div>
+          <div class="item-price"><span class="currency">DT</span>5,000</div>
         </div>
 
-        <div class="group-label">Blended</div>
+        <div class="group-label">Cocktails</div>
 
         <div class="menu-item">
           <div class="item-info">
-            <p class="item-name">Tropical Blend</p>
-            <p class="item-desc">Mango, pineapple, passion fruit. Sun in a glass.</p>
-            <span class="item-badge">Seasonal</span>
+            <p class="item-name">Cocktail Banane <span style="font-family:'Cormorant Garamond',serif;font-size:14px;color:var(--white-dim)">مشخشخ</span></p>
+            <p class="item-desc">Crémeux, festif, œuvre de fête.</p>
+            <span class="item-badge">Coup de cœur</span>
           </div>
-          <div class="item-price"><span class="currency">DT</span>7.000</div>
+          <div class="item-price"><span class="currency">DT</span>12,000</div>
         </div>
 
-        <!-- ↓ ADD MORE JUICE ITEMS HERE -->
+        <div class="menu-item">
+          <div class="item-info">
+            <p class="item-name">Cocktail Cup de Monde</p>
+            <p class="item-desc">Grand mélange, palette de champions.</p>
+            <span class="item-badge">Spécial</span>
+          </div>
+          <div class="item-price"><span class="currency">DT</span>15,000</div>
+        </div>
+
+        <!-- ↓ AJOUTER D'AUTRES JUS ICI -->
 
       </div>
     </section>
