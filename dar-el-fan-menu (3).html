@@ -1,0 +1,1742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>DAR EL FAN — Menu</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&family=IM+Fell+English:ital@1&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E2C87A;
+    --gold-dim: rgba(201,168,76,0.15);
+    --black: #111111;
+    --dark: #1E1E1E;
+    --grey-dark: #2A2A2A;
+    --grey-mid: #666666;
+    --grey-light: #AAAAAA;
+    --white: #FFFFFF;
+    --cream: #F7F3EC;
+    --cream-dark: #EDE5D5;
+  }
+
+  html, body {
+    min-height: 100%;
+    background: var(--dark);
+    font-family: 'Lato', sans-serif;
+    color: var(--black);
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(201,168,76,0.03) 40px, rgba(201,168,76,0.03) 41px),
+      radial-gradient(ellipse at 20% 50%, #1a1a1a 0%, #0e0e0e 100%);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .book-scene {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0 40px;
+  }
+
+  /* ── SHOP HEADER ── */
+  .shop-header { text-align: center; margin-bottom: 14px; padding: 0 20px; }
+  .shop-header .arabic-script {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    color: var(--gold-light);
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+  .shop-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 7vw, 44px);
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 4px;
+    line-height: 1.1;
+    margin: 4px 0 2px;
+  }
+  .shop-header h1 span { color: var(--gold); }
+  .shop-header .subtitle {
+    font-family: 'Lato', sans-serif;
+    font-size: 11px;
+    font-weight: 300;
+    color: var(--grey-light);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+  }
+  .gold-rule {
+    display: flex; align-items: center; gap: 10px;
+    margin: 8px auto 14px; width: 200px;
+  }
+  .gold-rule::before, .gold-rule::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .gold-rule .diamond {
+    width: 6px; height: 6px;
+    background: var(--gold);
+    transform: rotate(45deg);
+    flex-shrink: 0;
+  }
+
+  /* ══════════════════════════════
+     BOOK + PAGE TURN ENGINE
+  ══════════════════════════════ */
+  .book-wrap {
+    width: min(420px, 100vw - 24px);
+    position: relative;
+    /* perspective for 3D children */
+    perspective: 1200px;
+    perspective-origin: center center;
+  }
+
+  /* The visible book shell */
+  .book {
+    width: 100%;
+    background: var(--cream);
+    border-radius: 2px 8px 8px 2px;
+    box-shadow:
+      -4px 0 0 #888 inset,
+      0 0 0 1px rgba(0,0,0,0.2),
+      6px 6px 20px rgba(0,0,0,0.35),
+      14px 14px 40px rgba(0,0,0,0.45),
+      22px 22px 60px rgba(0,0,0,0.2);
+    position: relative;
+    overflow: hidden;
+    max-height: 85vh;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+  }
+  .book::-webkit-scrollbar { width: 3px; }
+  .book::-webkit-scrollbar-track { background: #E5DDD0; }
+  .book::-webkit-scrollbar-thumb { background: var(--gold); }
+
+  /* Spine */
+  .book::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0; width: 18px;
+    background: linear-gradient(90deg, #1a1a1a 0%, #3a3a3a 40%, transparent 100%);
+    z-index: 10;
+    pointer-events: none;
+  }
+  /* Page grain */
+  .book::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0.5;
+  }
+
+  /* ── PAGE TURN OVERLAY ── */
+  /* The flipping page sits OUTSIDE .book, over the book-wrap */
+  #page-flipper {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 100;
+    /* 3D context */
+    transform-style: preserve-3d;
+    transform-origin: left center;
+    display: none; /* shown via JS */
+  }
+
+  /* Front face of the turning page (what you see peeling away) */
+  #page-flipper .flip-front,
+  #page-flipper .flip-back {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 2px 8px 8px 2px;
+  }
+
+  #page-flipper .flip-front {
+    background: var(--cream);
+    /* curl shadow on right edge */
+    box-shadow: inset -8px 0 20px rgba(0,0,0,0.15);
+  }
+
+  /* Simulated page content on the flipping page face */
+  #page-flipper .flip-front::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 80%, rgba(0,0,0,0.08) 100%);
+  }
+
+  #page-flipper .flip-back {
+    background: var(--cream-dark);
+    transform: rotateY(180deg);
+    box-shadow: inset 8px 0 20px rgba(0,0,0,0.12);
+  }
+
+  /* CSS keyframes for the flip */
+  @keyframes flipForward {
+    0%   { transform: rotateY(0deg);    box-shadow: 6px 6px 20px rgba(0,0,0,0.35), 14px 14px 40px rgba(0,0,0,0.45); }
+    40%  { transform: rotateY(-60deg);  }
+    70%  { transform: rotateY(-120deg); }
+    100% { transform: rotateY(-180deg); box-shadow: none; }
+  }
+  @keyframes flipBackward {
+    0%   { transform: rotateY(-180deg); }
+    40%  { transform: rotateY(-120deg); }
+    70%  { transform: rotateY(-60deg); }
+    100% { transform: rotateY(0deg); }
+  }
+
+  #page-flipper.flipping-forward {
+    display: block;
+    animation: flipForward 0.55s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  #page-flipper.flipping-backward {
+    display: block;
+    animation: flipBackward 0.55s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  /* ── TABS ── */
+  .tabs {
+    position: absolute;
+    right: -1px; top: 90px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    z-index: 200;
+  }
+  .tab-btn {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    padding: 14px 7px;
+    font-family: 'Lato', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: none;
+    border-radius: 0 4px 4px 0;
+    transition: all 0.25s ease;
+    color: var(--grey-mid);
+    background: #E0D8CC;
+    box-shadow: 2px 0 4px rgba(0,0,0,0.15);
+    outline: none;
+    min-height: 58px;
+  }
+  .tab-btn.active {
+    background: var(--gold);
+    color: var(--black);
+    box-shadow: 3px 0 8px rgba(201,168,76,0.4);
+    transform: translateX(2px);
+  }
+  .tab-btn:hover:not(.active) { background: #D0C8BC; transform: translateX(1px); }
+
+  /* ── PAGES ── */
+  .section-page { display: none; padding: 24px 28px 32px 36px; min-height: 520px; }
+  .section-page.active { display: block; }
+
+  /* ── COVER ── */
+  .cover-page {
+    padding: 32px 28px 32px 36px;
+    min-height: 560px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(160deg, var(--cream) 0%, var(--cream-dark) 100%);
+    position: relative;
+  }
+  .cover-border {
+    position: absolute;
+    inset: 16px 16px 16px 24px;
+    border: 1px solid rgba(201,168,76,0.3);
+    pointer-events: none;
+  }
+  .cover-border::before {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border: 1px solid rgba(201,168,76,0.12);
+  }
+  .cover-ornament { font-size: 50px; margin-bottom: 14px; filter: sepia(0.3); }
+  .cover-page h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 30px; font-weight: 700;
+    color: var(--black); letter-spacing: 3px; line-height: 1.1;
+  }
+  .cover-page h2 em {
+    display: block;
+    font-style: italic; color: var(--gold);
+    font-size: 17px; font-weight: 400;
+    letter-spacing: 2px; margin-bottom: 4px;
+  }
+  .cover-page p {
+    margin: 16px 0;
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    color: var(--grey-mid);
+    font-size: 13px; line-height: 1.8; max-width: 250px;
+  }
+  .open-btn {
+    margin-top: 8px;
+    padding: 12px 30px;
+    background: var(--black);
+    color: var(--gold);
+    border: 1px solid var(--gold);
+    font-family: 'Lato', sans-serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .open-btn:hover { background: var(--gold); color: var(--black); }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    text-align: center;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(201,168,76,0.3);
+    position: relative;
+  }
+  .section-header .chapter-label {
+    font-family: 'Lato', sans-serif;
+    font-size: 9px; font-weight: 700;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: var(--gold); display: block; margin-bottom: 3px;
+  }
+  .section-header h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 700; color: var(--black);
+  }
+  .section-header .icon { font-size: 26px; display: block; margin-bottom: 4px; }
+  .section-header::before, .section-header::after {
+    content: '✦';
+    position: absolute;
+    bottom: -8px;
+    font-size: 12px;
+    color: var(--gold);
+    background: var(--cream);
+    padding: 0 4px;
+  }
+  .section-header::before { left: 16px; }
+  .section-header::after  { right: 16px; }
+
+  /* ── SUBSECTION LABEL ── */
+  .subsection-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 18px 0 12px;
+  }
+  .subsection-label .sl-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    font-weight: 600;
+    font-style: italic;
+    color: var(--black);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .subsection-label .sl-text .sl-icon { font-size: 15px; }
+  .subsection-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(201,168,76,0.5), transparent);
+  }
+
+  /* ── MENU ITEMS ── */
+  .menu-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 11px 0;
+    border-bottom: 1px dashed rgba(0,0,0,0.09);
+    gap: 10px;
+  }
+  .menu-item:last-child { border-bottom: none; }
+  .item-info { flex: 1; }
+  .item-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px; font-weight: 600;
+    color: var(--black); line-height: 1.2;
+  }
+  .item-desc {
+    font-family: 'Lato', sans-serif;
+    font-size: 11px; font-weight: 300;
+    color: var(--grey-mid);
+    margin-top: 3px; line-height: 1.5; font-style: italic;
+  }
+  .item-sizes {
+    font-family: 'Lato', sans-serif;
+    font-size: 10px; color: var(--grey-light); margin-top: 3px;
+  }
+  .item-price-block { text-align: right; flex-shrink: 0; }
+  .item-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px; font-weight: 600;
+    color: var(--gold); white-space: nowrap;
+  }
+  .item-price .currency {
+    font-size: 10px;
+    font-family: 'Lato', sans-serif;
+    font-weight: 400; color: var(--grey-light);
+    vertical-align: super; margin-right: 1px;
+  }
+  .item-price-sm {
+    font-family: 'Lato', sans-serif;
+    font-size: 10px; color: var(--grey-light); white-space: nowrap;
+  }
+  .new-badge {
+    display: inline-block;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-size: 7px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    padding: 1px 4px; margin-left: 5px;
+    vertical-align: middle;
+    font-family: 'Lato', sans-serif;
+  }
+
+  /* ── DIVIDER ── */
+  .menu-divider {
+    text-align: center; margin: 14px 0 10px; position: relative;
+  }
+  .menu-divider span {
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 11px;
+    color: var(--grey-mid);
+    background: var(--cream); padding: 0 10px;
+    position: relative; z-index: 1;
+  }
+  .menu-divider::before {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; top: 50%; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.4), transparent);
+  }
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0 0;
+    border-top: 1px solid rgba(0,0,0,0.08);
+    margin-top: 20px;
+  }
+  .nav-arrow {
+    background: none;
+    border: 1px solid rgba(201,168,76,0.4);
+    color: var(--gold);
+    font-size: 12px; padding: 7px 14px;
+    cursor: pointer;
+    font-family: 'Lato', sans-serif;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+  .nav-arrow:hover { background: var(--gold-dim); }
+  .nav-arrow:disabled { opacity: 0.2; cursor: default; background: none; }
+
+  .page-num {
+    text-align: center; margin-top: 14px;
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 11px; color: var(--grey-light);
+  }
+  .page-num .pn-wrap { display: inline-flex; align-items: center; gap: 8px; }
+  .page-num .pn-wrap::before { content: '— '; color: var(--gold); }
+  .page-num .pn-wrap::after  { content: ' —'; color: var(--gold); }
+
+  /* Info box */
+  .info-box {
+    background: rgba(201,168,76,0.06);
+    border-left: 2px solid var(--gold);
+    padding: 12px 14px; margin: 4px 0 8px;
+    font-family: 'Lato', sans-serif;
+    font-size: 11px; color: var(--grey-mid); line-height: 1.9;
+  }
+  .info-box strong { color: var(--black); font-size: 12px; }
+
+  .book-footer {
+    margin-top: 18px; text-align: center;
+    color: var(--grey-mid); font-size: 10px;
+    font-family: 'Lato', sans-serif;
+    letter-spacing: 2px; text-transform: uppercase; opacity: 0.5;
+  }
+
+  /* ── CURL SHADOW on right edge while idle (realism) ── */
+  .book-curl {
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 40px; height: 40px;
+    pointer-events: none;
+    z-index: 50;
+    background: linear-gradient(225deg, #d0c8bb 0%, var(--cream) 50%, transparent 100%);
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
+    filter: drop-shadow(-3px -3px 4px rgba(0,0,0,0.18));
+  }
+</style>
+</head>
+<body>
+<div class="book-scene">
+
+  <div class="shop-header">
+    <span class="arabic-script">دار الفن — since 2026</span>
+    <h1>DAR EL <span>FAN</span></h1>
+    <p class="subtitle">Coffee &amp; Art House</p>
+  </div>
+  <div class="gold-rule"><div class="diamond"></div></div>
+
+  <div class="book-wrap">
+
+    <!-- Page flipper (injected by JS, sits here for DOM flow) -->
+    <div id="page-flipper">
+      <div class="flip-front"></div>
+      <div class="flip-back"></div>
+    </div>
+
+    <div class="book" id="book">
+
+      <!-- TABS -->
+      <div class="tabs" id="tabs">
+        <button class="tab-btn active" data-page="cover"  onclick="goTo('cover',  event)">Menu</button>
+        <button class="tab-btn"        data-page="coffee" onclick="goTo('coffee', event)">Coffee</button>
+        <button class="tab-btn"        data-page="drinks-jus" onclick="goTo('drinks-jus', event)">Drinks</button>
+        <button class="tab-btn"        data-page="food-tiramisu"   onclick="goTo('food-tiramisu',   event)">Delights</button>
+        <button class="tab-btn"        data-page="extras" onclick="goTo('extras', event)">Extras</button>
+      </div>
+
+      <!-- ══ COVER ══ -->
+      <div class="section-page active" id="page-cover">
+        <div class="cover-page">
+          <div class="cover-border"></div>
+          <div class="cover-ornament">☕</div>
+          <h2><em>Welcome to</em>DAR EL FAN</h2>
+          <p>Where every cup tells a story and every sip is a work of art. Crafted with passion, served with soul.</p>
+          <div class="gold-rule"><div class="diamond"></div></div>
+          <button class="open-btn" onclick="goTo('coffee', event)">Open Menu ›</button>
+        </div>
+      </div>
+
+      <!-- ══ COFFEE ══ -->
+      <div class="section-page" id="page-coffee">
+        <div class="section-header">
+          <span class="icon">☕</span>
+          <span class="chapter-label">Chapter I</span>
+          <h3>Coffee</h3>
+        </div>
+
+        <!-- HOT -->
+        <div class="subsection-label">
+          <span class="sl-text"><span class="sl-icon">🔥</span> Hot Coffee</span>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Express</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>3.3</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">américain</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>3.8</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">cappucin</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>3.8</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">café créme</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>4.5</div>
+          </div>
+        </div>
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">café turc</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>5.5</div>
+          </div>
+        </div>
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Cappuccino</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>5.8</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Café Latte</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>6.8</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">café Dar El Fan</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>8,8</div>
+          </div>
+        </div>
+
+        <!-- COLD -->
+        <div class="subsection-label" style="margin-top:22px;">
+          <span class="sl-text"><span class="sl-icon">🧊</span> Cold Coffee</span>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Ice cofee</div>
+            <div class="item-desc">Nutella , Noisette , Caramel , Vanille</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>7.5</div>
+          </div>
+        </div>
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Frappuccino</div>
+            <div class="item-desc">Nutella , Noisette , Caramel , Vanille , spéculos , besquite</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>9.7</div>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <button class="nav-arrow" disabled>‹ Prev</button>
+          <button class="nav-arrow" onclick="goTo('drinks-jus', event)">Next ›</button>
+        </div>
+        <div class="page-num"><span class="pn-wrap">1</span></div>
+      </div>
+
+      <!-- ══ DRINKS: JUS ══ -->
+      <div class="section-page" id="page-drinks-jus">
+        <div class="section-header">
+          <span class="icon">🍊</span>
+          <span class="chapter-label">Chapter II · 1/6</span>
+          <h3>Jus</h3>
+        </div>
+
+        <div class="menu-divider"><span>Fresh Pressed Juices</span></div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Jus de Citron</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>5.5</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Jus de Fraise</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>7.5</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Jus de Banane</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>8.5</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Jus de Manga</div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>11.5</div>
+  </div>
+</div>
+<div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Jus d'Ananas</div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>11.5</div>
+  </div>
+</div>
+        <div class="bottom-nav">
+          <button class="nav-arrow" onclick="goTo('coffee', event)">‹ Prev</button>
+          <button class="nav-arrow" onclick="goTo('drinks-smoothies', event)">Next ›</button>
+        </div>
+        <div class="page-num"><span class="pn-wrap">2</span></div>
+      </div>
+
+      <!-- ══ DRINKS: SMOOTHIES ══ -->
+      <div class="section-page" id="page-drinks-smoothies">
+        <div class="section-header">
+          <span class="icon">🥤</span>
+          <span class="chapter-label">Chapter II · 2/6</span>
+          <h3>Smoothies</h3>
+        </div>
+
+        <div class="menu-divider"><span>Blended &amp; Wholesome</span></div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Pinacolade</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>11</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Fruit Rouge </div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>11</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Fruit Passion</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>11.5</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Ananas</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>11.5</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Manga</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>11.8</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Kiwi</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>12</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Blue Berry</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>12.7</div>
+          </div>
+        </div>
+
+        <div class="bottom-nav">
+          <button class="nav-arrow" onclick="goTo('drinks-jus', event)">‹ Prev</button>
+          <button class="nav-arrow" onclick="goTo('drinks-mojito', event)">Next ›</button>
+        </div>
+        <div class="page-num"><span class="pn-wrap">3</span></div>
+      </div>
+
+      <!-- ══ DRINKS: MOJITO ══ -->
+      <div class="section-page" id="page-drinks-mojito">
+        <div class="section-header">
+          <span class="icon">🌿</span>
+          <span class="chapter-label">Chapter II · 3/6</span>
+          <h3>Mojito</h3>
+        </div>
+
+        <div class="menu-divider"><span>Virgin Mojitos</span></div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Virgin</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>6.7</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Blue</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>7.8</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Fruit Rouge</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>7.8</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Tropical</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>8.8</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Energitique</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>12.8</div>
+          </div>
+        </div>
+
+        <div class="bottom-nav">
+          <button class="nav-arrow" onclick="goTo('drinks-smoothies', event)">‹ Prev</button>
+          <button class="nav-arrow" onclick="goTo('drinks-boisson', event)">Next ›</button>
+        </div>
+        <div class="page-num"><span class="pn-wrap">4</span></div>
+      </div>
+
+      <!-- ══ DRINKS: BOISSON ══ -->
+      <div class="section-page" id="page-drinks-boisson">
+        <div class="section-header">
+          <span class="icon">🍵</span>
+          <span class="chapter-label">Chapter II · 4/6</span>
+          <h3>Thé &amp; Boisson</h3>
+        </div>
+
+        <div class="menu-divider"><span>Thés </span></div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Thé à la Menthe </div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>4</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Thé à l'Amandes</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>6.8</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Thé aux pignons</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>8.2</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Thé Dar El Fan</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>11.5</div>
+          </div>
+        </div>
+
+        <div class="menu-divider"><span>Boissons Fraîches</span></div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Eau 1L</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>3</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Soda</div>
+            <div class="item-desc">Coca Cola , Fanta , Boga Lime , Apla</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>4</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Détox</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>5.5</div>
+          </div>
+        </div>
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Red Bull</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>8</div>
+          </div>
+        </div>
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Shark</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>8</div>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <button class="nav-arrow" onclick="goTo('drinks-mojito', event)">‹ Prev</button>
+          <button class="nav-arrow" onclick="goTo('drinks-milkshake', event)">Next ›</button>
+        </div>
+        <div class="page-num"><span class="pn-wrap">5</span></div>
+      </div>
+
+      <!-- ══ DRINKS: MILKSHAKE ══ -->
+      <div class="section-page" id="page-drinks-milkshake">
+        <div class="section-header">
+          <span class="icon">🥛</span>
+          <span class="chapter-label">Chapter II · 5/6</span>
+          <h3>Milkshake</h3>
+        </div>
+
+        <div class="menu-divider"><span>Thick &amp; Creamy</span></div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Milkshake </div>
+            <div class="item-desc">Vanille . Nutella . Caramel . Spéculos . fraise . pistache</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>9.8</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Milkshake vanille oreo</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>11.8</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Milkshake nutelle oreo</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>11.8</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Milkshake Bounty</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>12.8</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Milkshake Snickers</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>12.8</div>
+          </div>
+        </div>
+
+
+        <div class="bottom-nav">
+          <button class="nav-arrow" onclick="goTo('drinks-boisson', event)">‹ Prev</button>
+          <button class="nav-arrow" onclick="goTo('drinks-cocktails', event)">Next ›</button>
+        </div>
+        <div class="page-num"><span class="pn-wrap">6</span></div>
+      </div>
+
+      <!-- ══ DRINKS: COCKTAILS ══ -->
+      <div class="section-page" id="page-drinks-cocktails">
+        <div class="section-header">
+          <span class="icon">🍹</span>
+          <span class="chapter-label">Chapter II · 6/6</span>
+          <h3>Cocktails</h3>
+        </div>
+
+        <!-- SPECIALTY -->
+        <div class="subsection-label">
+          <span class="sl-text"><span class="sl-icon">⭐</span> Spécialité</span>
+        </div>
+        <div class="menu-item" style="background: rgba(201,168,76,0.05); border-radius: 4px; padding: 12px 10px; margin-bottom: 4px;">
+  <div class="item-info">
+    <div class="item-name" style="color: var(--gold);">Mini Jwajem</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>7.5</div>
+  </div>
+</div>
+        <div class="menu-item" style="background: rgba(201,168,76,0.05); border-radius: 4px; padding: 12px 10px; margin-bottom: 4px;">
+          <div class="item-info">
+            <div class="item-name" style="color: var(--gold);">Jwajem</div>
+            <div class="item-desc"></div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>14.8</div>
+          </div>
+        </div>
+
+        <!-- SIGNATURE -->
+        <div class="subsection-label" style="margin-top:16px;">
+          <span class="sl-text"><span class="sl-icon">✦</span> Signature</span>
+        </div>
+
+        <div class="menu-item" style="background: rgba(201,168,76,0.05); border-radius: 4px; padding: 12px 10px; margin-bottom: 4px;">
+          <div class="item-info">
+            <div class="item-name" style="color: var(--gold);">Sangria</div>
+            <div class="item-desc">pour deux personnes</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>9.8</div>
+          </div>
+        </div>
+        <div class="menu-item" style="background: rgba(201,168,76,0.05); border-radius: 4px; padding: 12px 10px; margin-bottom: 4px;">
+  <div class="item-info">
+    <div class="item-name" style="color: var(--gold);">Sangria</div>
+    <div class="item-desc">pour quatre personnes</div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>13.6</div>
+  </div>
+</div>
+        <div class="menu-divider"><span> Cocktails</span></div>
+        <div class="menu-item">
+        <div class="item-info">
+          <div class="item-name">Mangos</div>
+            <div class="item-desc"></div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>7.5</div>
+          </div>
+        </div>
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Fruit Rouge</div>
+            <div class="item-desc"></div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>7.5</div>
+          </div>
+        </div>
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Hawai</div>
+            <div class="item-desc"></div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>7.5</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Zigzag</div>
+            <div class="item-desc"></div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>7.9</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Banane Fraise</div>
+            <div class="item-desc"></div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>9.8</div>
+          </div>
+        </div>
+        <div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Banane Kiwi</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>9.8</div>
+  </div>
+</div>
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Healthy</div>
+            <div class="item-desc"></div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>12.8</div>
+          </div>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Cocktail Fruit</div>
+            <div class="item-desc"></div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>13.8</div>
+          </div>
+        </div>
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Cocktail Dar El Fan</div>
+            <div class="item-desc"></div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>16.6</div>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <button class="nav-arrow" onclick="goTo('drinks-milkshake', event)">‹ Prev</button>
+          <button class="nav-arrow" onclick="goTo('food-tiramisu', event)">Next ›</button>
+        </div>
+        <div class="page-num"><span class="pn-wrap">7</span></div>
+      </div>
+
+      <!-- ══ DELIGHTS: TIRAMISU ══ -->
+      <div class="section-page" id="page-food-tiramisu">
+        <div class="section-header">
+          <span class="icon">✨</span>
+          <span class="chapter-label">Chapter III · 1/6</span>
+          <h3>Delights</h3>
+        </div>
+
+        <div class="subsection-label">
+          <span class="sl-text"><span class="sl-icon">☕</span> Tiramisu</span>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Nutella</div>
+            <div class="item-desc"></div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>7.5</div>
+          </div>
+        </div>
+        <div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Oreo</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>7.5</div>
+  </div>
+</div>
+<div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Spéculos</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>7.5</div>
+  </div>
+</div>
+<div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Fruit Sec</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>7.5</div>
+  </div>
+</div>
+<div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Fruit saison</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>7.5</div>
+  </div>
+</div>
+
+        <div class="bottom-nav">
+          <button class="nav-arrow" onclick="goTo('drinks-cocktails', event)">‹ Prev</button>
+          <button class="nav-arrow" onclick="goTo('food-cheesecake', event)">Next ›</button>
+        </div>
+        <div class="page-num"><span class="pn-wrap">8</span></div>
+      </div>
+
+      <!-- ══ DELIGHTS: CHEESECAKE ══ -->
+      <div class="section-page" id="page-food-cheesecake">
+        <div class="section-header">
+          <span class="icon">✨</span>
+          <span class="chapter-label">Chapter III · 2/6</span>
+          <h3>Delights</h3>
+        </div>
+
+        <div class="subsection-label">
+          <span class="sl-text"><span class="sl-icon">🍰</span> Cheesecake</span>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Nutella</div>
+            <div class="item-desc"></div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>7.5</div>
+          </div>
+        </div>
+        <div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Oreo</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>7.5</div>
+  </div>
+</div>
+<div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Fruit Sec</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>7.5</div>
+  </div>
+</div>
+<div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Spéculos</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>7.5</div>
+  </div>
+</div>
+<div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Fruit Saison</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>7.5</div>
+  </div>
+</div>
+        <div class="bottom-nav">
+          <button class="nav-arrow" onclick="goTo('food-tiramisu', event)">‹ Prev</button>
+          <button class="nav-arrow" onclick="goTo('food-pancake', event)">Next ›</button>
+        </div>
+        <div class="page-num"><span class="pn-wrap">9</span></div>
+      </div>
+
+      <!-- ══ DELIGHTS: PANCAKE ══ -->
+      <div class="section-page" id="page-food-pancake">
+        <div class="section-header">
+          <span class="icon">✨</span>
+          <span class="chapter-label">Chapter III · 3/6</span>
+          <h3>Delights</h3>
+        </div>
+
+        <div class="subsection-label">
+          <span class="sl-text"><span class="sl-icon">🥞</span> Pancake</span>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Nutella</div>
+            <div class="item-desc"></div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>6.8</div>
+          </div>
+        </div>
+        <div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Caramel</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>6.8</div>
+  </div>
+</div>
+<div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Banane</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>7.9</div>
+  </div>
+</div>
+<div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Fruit Sec</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>10.5</div>
+  </div>
+</div>
+<div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Spéculos</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>11.5</div>
+  </div>
+</div>
+<div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Dar El Fan</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>14.8</div>
+  </div>
+</div>
+
+        <div class="bottom-nav">
+          <button class="nav-arrow" onclick="goTo('food-cheesecake', event)">‹ Prev</button>
+          <button class="nav-arrow" onclick="goTo('food-crepe', event)">Next ›</button>
+        </div>
+        <div class="page-num"><span class="pn-wrap">10</span></div>
+      </div>
+
+      <!-- ══ DELIGHTS: CREPE ══ -->
+      <div class="section-page" id="page-food-crepe">
+        <div class="section-header">
+          <span class="icon">✨</span>
+          <span class="chapter-label">Chapter III · 4/6</span>
+          <h3>Delights</h3>
+        </div>
+
+        <div class="subsection-label">
+          <span class="sl-text"><span class="sl-icon">🫔</span> Crêpe</span>
+        </div>
+        <div class="menu-divider"><span>salé</span></div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name"> Fromage</div>
+            <div class="item-desc"></div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>6</div>
+          </div>
+        </div>
+        <div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Thon</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>7.5</div>
+  </div>
+</div>
+<div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Jombon</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>7.5</div>
+  </div>
+</div>
+<div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Dar El Fan</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>11.5</div>
+  </div>
+</div>
+        <div class="menu-divider"><span>sucré</span></div>
+        <div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Nutella</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>7.8</div>
+  </div>
+</div>
+<div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Caramel</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>7.8</div>
+  </div>
+</div>
+<div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Banane</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>8.8</div>
+  </div>
+</div>
+<div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Fruit Sec</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>10.5</div>
+  </div>
+</div>
+<div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Spéculos</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>11.5</div>
+  </div>
+</div>
+<div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Dar El Fan</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>14.8</div>
+  </div>
+</div>
+        <div class="bottom-nav">
+          <button class="nav-arrow" onclick="goTo('food-pancake', event)">‹ Prev</button>
+          <button class="nav-arrow" onclick="goTo('food-dessert-cups', event)">Next ›</button>
+        </div>
+        <div class="page-num"><span class="pn-wrap">11</span></div>
+      </div>
+
+      <!-- ══ DELIGHTS: DESSERT CUPS ══ -->
+      <div class="section-page" id="page-food-dessert-cups">
+        <div class="section-header">
+          <span class="icon">✨</span>
+          <span class="chapter-label">Chapter III · 5/6</span>
+          <h3>Delights</h3>
+        </div>
+
+        <div class="subsection-label">
+          <span class="sl-text"><span class="sl-icon">🍮</span> Dessert Cups</span>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Salade De Fruit</div>
+            <div class="item-desc"></div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>7.5</div>
+          </div>
+        </div>
+        <div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Ice Cream Fruit</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>8.8</div>
+  </div>
+</div>
+<div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Banane Split</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>10.5</div>
+  </div>
+</div>
+<div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Ice Cream Fruit</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>12.5</div>
+  </div>
+</div>
+
+
+
+
+        <div class="bottom-nav">
+          <button class="nav-arrow" onclick="goTo('food-crepe', event)">‹ Prev</button>
+          <button class="nav-arrow" onclick="goTo('food-ice-cream', event)">Next ›</button>
+        </div>
+        <div class="page-num"><span class="pn-wrap">12</span></div>
+      </div>
+
+      <!-- ══ DELIGHTS: ICE CREAM ══ -->
+      <div class="section-page" id="page-food-ice-cream">
+        <div class="section-header">
+          <span class="icon">✨</span>
+          <span class="chapter-label">Chapter III · 6/6</span>
+          <h3>Delights</h3>
+        </div>
+
+        <div class="subsection-label">
+          <span class="sl-text"><span class="sl-icon">🍦</span> Ice Cream</span>
+        </div>
+
+        <div class="menu-item">
+          <div class="item-info">
+            <div class="item-name">Enfant</div>
+            <div class="item-desc">1 bool</div>
+          </div>
+          <div class="item-price-block">
+            <div class="item-price"><span class="currency">TND </span>4.5</div>
+          </div>
+        </div>
+        <div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Bali</div>
+    <div class="item-desc"> 2 bool</div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>6.8</div>
+  </div>
+</div>
+        
+<div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Huawei</div>
+    <div class="item-desc">3 bool</div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>8.8</div>
+  </div>
+</div>
+        
+<div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Sorbet Citron</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>7.8</div>
+  </div>
+</div>
+        
+<div class="menu-item">
+  <div class="item-info">
+    <div class="item-name">Dar El Fan</div>
+    <div class="item-desc"></div>
+  </div>
+  <div class="item-price-block">
+    <div class="item-price"><span class="currency">TND </span>12.8</div>
+  </div>
+</div>
+        
+
+
+        <div class="bottom-nav">
+          <button class="nav-arrow" onclick="goTo('food-dessert-cups', event)">‹ Prev</button>
+          <button class="nav-arrow" onclick="goTo('extras', event)">Next ›</button>
+        </div>
+        <div class="page-num"><span class="pn-wrap">13</span></div>
+      </div>
+
+      <!-- ══ EXTRAS ══ -->
+      <div class="section-page" id="page-extras">
+        <div class="section-header">
+          <span class="icon">✨</span>
+          <span class="chapter-label">Chapter IV</span>
+          <h3>Extras</h3>
+        </div>
+
+        <div class="menu-divider"><span>extra supplements</span></div>
+
+        <div class="menu-item">
+          <div class="item-info"><div class="item-name">Arôme</div><div class="item-desc"></div></div>
+          <div class="item-price-block"><div class="item-price"><span class="currency">TND </span>1.5</div></div>
+        </div>
+        <div class="menu-item">
+          <div class="item-info"><div class="item-name">Créme chantilly</div><div class="item-desc"></div></div>
+          <div class="item-price-block"><div class="item-price"><span class="currency">TND </span>2</div></div>
+        </div>
+        <div class="menu-item">
+          <div class="item-info"><div class="item-name">Bool de glace</div><div class="item-desc"></div></div>
+          <div class="item-price-block"><div class="item-price"><span class="currency">TND </span>2.5</div></div>
+        </div>
+        <div class="menu-item">
+          <div class="item-info"><div class="item-name">nestlé</div><div class="item-desc"></div></div>
+          <div class="item-price-block"><div class="item-price"><span class="currency">TND </span>1.5</div></div>
+        </div>
+        <div class="menu-item">
+          <div class="item-info"><div class="item-name">fruit sec</div><div class="item-desc"></div></div>
+          <div class="item-price-block"><div class="item-price"><span class="currency">TND </span>3</div></div>
+        </div>
+        <div class="menu-item">
+          <div class="item-info"><div class="item-name">grenadine</div><div class="item-desc"></div></div>
+          <div class="item-price-block"><div class="item-price"><span class="currency">TND </span>1.5</div></div>
+        </div>
+        <div class="menu-divider"><span>The Details</span></div>
+
+        <div class="info-box">
+          <strong>Hours</strong><br>
+          Mon – Fri &nbsp;· 8:00 AM – 10:00 PM<br>
+          Sat – Sun &nbsp;· 9:00 AM – 11:00 PM<br><br>
+          <strong>WiFi</strong><br>
+          Network: <em>DarElFan_Guest</em><br>
+          Pass: <em>coffee2024</em><br><br>
+          <strong>Reservations</strong><br>
+          Birthdays · call or DM us
+        </div>
+
+        <div class="bottom-nav">
+          <button class="nav-arrow" onclick="goTo('food-ice-cream', event)">‹ Prev</button>
+          <button class="nav-arrow" onclick="goTo('cover', event)">Cover</button>
+        </div>
+        <div class="page-num"><span class="pn-wrap">9</span></div>
+      </div>
+
+      <!-- Page curl decoration -->
+      <div class="book-curl"></div>
+
+    </div><!-- end .book -->
+  </div><!-- end .book-wrap -->
+
+  <div class="book-footer">© Dar El Fan · All Rights Reserved</div>
+</div>
+
+<script>
+  const PAGE_ORDER = ['cover','coffee','drinks-jus','drinks-smoothies','drinks-mojito','drinks-boisson','drinks-milkshake','drinks-cocktails','food-tiramisu','food-cheesecake','food-pancake','food-crepe','food-dessert-cups','food-ice-cream','extras'];
+  let currentPage = 'cover';
+  let isFlipping  = false;
+
+  /* Snapshot the visible book content as a background-image for the flipper */
+  function getBookSnapshot() {
+    // We just use the cream color — keeps it lightweight and realistic
+    return null;
+  }
+
+  function goTo(id, e) {
+    if (id === currentPage || isFlipping) return;
+
+    const fromIndex = PAGE_ORDER.indexOf(currentPage);
+    const toIndex   = PAGE_ORDER.indexOf(id);
+    const forward   = toIndex > fromIndex;
+
+    isFlipping = true;
+
+    const flipper = document.getElementById('page-flipper');
+    const book    = document.getElementById('book');
+
+    /* Position flipper over the book */
+    const bookRect = book.getBoundingClientRect();
+    const wrapRect = document.querySelector('.book-wrap').getBoundingClientRect();
+
+    flipper.style.width  = bookRect.width  + 'px';
+    flipper.style.height = bookRect.height + 'px';
+    flipper.style.top    = (bookRect.top - wrapRect.top) + 'px';
+    flipper.style.left   = '0px';
+
+    /* Add depth shadow while flipping */
+    flipper.querySelector('.flip-front').style.background =
+      forward
+        ? 'linear-gradient(90deg, #f7f3ec 0%, #e8dfd0 60%, #c8bfb0 100%)'
+        : 'linear-gradient(90deg, #c8bfb0 0%, #e8dfd0 40%, #f7f3ec 100%)';
+
+    flipper.querySelector('.flip-back').style.background = '#EDE5D5';
+
+    /* Run flip */
+    flipper.classList.remove('flipping-forward','flipping-backward');
+    void flipper.offsetWidth; // reflow
+    flipper.classList.add(forward ? 'flipping-forward' : 'flipping-backward');
+
+    /* Halfway through: swap page content */
+    setTimeout(() => {
+      document.querySelectorAll('.section-page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-' + id).classList.add('active');
+      book.scrollTo({ top: 0, behavior: 'instant' });
+
+      /* Update tabs */
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        const pg = btn.dataset.page;
+        const isActive = pg === id || (pg === 'drinks-jus' && id.startsWith('drinks-')) || (pg === 'food-tiramisu' && id.startsWith('food-'));
+        btn.classList.toggle('active', isActive);
+      });
+      currentPage = id;
+    }, 270); /* half of 550ms */
+
+    /* Clean up */
+    setTimeout(() => {
+      flipper.classList.remove('flipping-forward','flipping-backward');
+      flipper.style.display = 'none';
+      isFlipping = false;
+    }, 580);
+  }
+</script>
+</body>
+</html>
